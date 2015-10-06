@@ -15,8 +15,8 @@
  */
 
 preferences {
-    input("IPAddress", "text", title: "IP Address", description: "Enter IP Address", required: true, defaultvalue: "192.168.1.1", displayDuringSetup: true)
-    input("Port", "text", title: "Port", description: "", required: true, defaultvalue: 80, displayDuringSetup: true)
+    input("ip", "text", title: "IP Address", description: "Enter IP Address", required: true, defaultvalue: "192.168.1.1", displayDuringSetup: true)
+    input("port", "text", title: "Port", description: "", required: true, defaultvalue: 80, displayDuringSetup: true)
     input("DefaultVolume", "number", title: "Default Volume", description: "0-100 (Optional)", required: false, defaultvalue: 100, displayDuringSetup: true)
     }
 
@@ -170,15 +170,40 @@ def speak() {
 	// TODO: handle 'speak' command
 }
 
+//following "borrowed" from obything code
+private PostToDevice(SoundURI,volume=null) {
+	log.trace "Post to device"
+	log.debug "176 PostToDevice with SoundURI: $SoundURI and volume: $volume"
+    device.deviceNetworkId = getHostAddress()
+    def path = "/play.php"
+    log.debug "path: $path"
+    def headers = [:] 
+    def body = "body dummy"
+    headers.put("HOST", "${ip}:${port}")
+    headers.put("Content-Type", "application/x-www-form-urlencoded")
+    log.debug "headers: $headers"
+    def method = "POST"
+    log.debug "method: $method"
+    def result = new physicalgraph.device.HubAction(
+        method: method,
+        path: path,
+        body: body,
+        headers: headers
+	)
+    result
+}
+
+
 // following "borrowed" from
 // https://github.com/nicholaswilde/smartthings/blob/master/device-types/raspberry-pi/raspberry-pi.device.groovy
-private PostToDevice(SoundURI,volume=null){
-	device.deviceNetworkId = getHostAddress()
+private PostToDeviceOLD(SoundURI,volume=null){
+	log.trace "176 PostToDevice with SoundURI: $SoundURI and volume: $volume"
+    device.deviceNetworkId = getHostAddress()
     if (volume==null) volume = DefaultVolume
-	def headers = [HOST: "${IPAddress}:${Port}"]
-    log.debug "179 headers are $headers"
+	def headers = [HOST: "${ip}:${port}"]
+    log.debug "180 headers are $headers"
 	def uri = "/play.php"
-	log.debug "181 uri is $uri"
+	log.debug "182 uri is $uri"
 	def result = new physicalgraph.device.HubAction(
   		method: "GET",
   		path: uri,
@@ -190,30 +215,16 @@ private PostToDevice(SoundURI,volume=null){
 
 // gets the address of the device
 private getHostAddress() {
-    def ip = IPAddress
-    def port = Port
-
-    if (!ip || !port) {
-        def parts = device.deviceNetworkId.split(":")
-        if (parts.length == 2) {
-            ip = parts[0]
-            port = parts[1]
-        } else {
-            log.warn "Can't figure out ip and port for device: ${device.id}"
-        }
-    }
-
-    log.debug "Using IP: $ip and port: $port for device: ${device.id}"
-    return convertIPtoHex(ip) + ":" + convertPortToHex(port)
-}
+	log.debug "212 Using IP: $ip and port: $port for device: ${device.id}"
+	return convertIPtoHex(ip) + ":" + convertPortToHex(port)
+	}
 
 private String convertIPtoHex(ipAddress) { 
-    String hex = ipAddress.tokenize( '.' ).collect {  String.format( '%02x', it.toInteger() ) }.join()
-    return hex
-
-}
+	String hex = ipAddress.tokenize( '.' ).collect {  String.format( '%02x', it.toInteger() ) }.join()
+	return hex
+	}
 
 private String convertPortToHex(port) {
 	String hexport = port.toString().format( '%04x', port.toInteger() )
     return hexport
-}
+	}
