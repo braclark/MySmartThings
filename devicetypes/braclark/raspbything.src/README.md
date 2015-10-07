@@ -12,18 +12,16 @@
    * `sudo chmod 777 /var/www` I did this so that user "pi" could edit the files without sudo
    * `sudo apt-get install php5 libapache2-mod-php5 -y`
    * `rm index.html`
-   * `nano index.php`
+   * `nano /var/www/index.php`
    * `<?php phpinfo(); />`
    * Test from another computer on the network `http://192.168.1.XX/index.php?track=test`
 1. Setup for web requests to play audio
-   * Setup so that www-data can use audio
-      * [Reference used](http://raspberrypi.stackexchange.com/questions/19482/using-php-exec-command-to-play-audio-on-the-pi-no-audio-group)
-      * `sudo chmod 777 /dev/snd/` (not sure of the exact line)
+  * Setup so that www-data can use audio
+   * [Reference used](http://raspberrypi.stackexchange.com/questions/19482/using-php-exec-command-to-play-audio-on-the-pi-no-audio-group)
+   * `sudo chmod 777 /dev/snd/` (not sure of the exact line)
    * Copy play.php into /var/www/
    * Test by requesting the following from a computer on a network.
-      * `http://192.168.1.XX/play.php?track=http://s3.amazonaws.com/smartapp-media/sonos/bell1.mp3&volume=50`
+    * `http://192.168.1.XX/play.php?track=http://s3.amazonaws.com/smartapp-media/sonos/bell1.mp3&volume=50`
 1. Install Raspbything device type
   * Modified from Obything code
 1. Install "Sonos Notify With Sound"
-1. ...
-1. Profit
