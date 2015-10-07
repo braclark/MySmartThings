@@ -14,7 +14,7 @@
  *
  */
  
-import groovy.json.JsonSlurper
+//import groovy.json.JsonSlurper
 
 metadata {
 	definition (name: "RaspbyThing", namespace: "braclark", author: "Brandon Clark") {
@@ -55,43 +55,43 @@ metadata {
 		}
 
 		// Row 2
-		standardTile("airplay", "device.switch", width: 1, height: 1, decoration: "flat", canChangeIcon: true) {
-			state "on", label:'AirPlay On', action:"switch.off", icon:"st.Electronics.electronics14", nextState:"off", backgroundColor:"#ffffff"
-			state "off", label:'AirPlay Off', action:"switch.on", icon:"st.Electronics.electronics16", nextState:"on", backgroundColor:"#ffffff"
-		}
-		standardTile("status", "device.status", width: 1, height: 1, decoration: "flat", canChangeIcon: true) {
-			state "playing", label:'Playing', action:"music Player.pause", icon:"st.Electronics.electronics19", nextState:"paused", backgroundColor:"#ffffff"
-			state "stopped", label:'Stopped', action:"music Player.play", icon:"st.Electronics.electronics19", nextState:"playing", backgroundColor:"#ffffff"
-			state "paused", label:'Paused', action:"music Player.play", icon:"st.Electronics.electronics19", nextState:"playing", backgroundColor:"#ffffff"
-		}
-		standardTile("mute", "device.mute", inactiveLabel: false, decoration: "flat") {
-			state "unmuted", label:"Mute", action:"music Player.mute", icon:"st.custom.sonos.unmuted", backgroundColor:"#ffffff", nextState:"muted"
-			state "muted", label:"Unmute", action:"music Player.unmute", icon:"st.custom.sonos.muted", backgroundColor:"#ffffff", nextState:"unmuted"
-		}
-
-		// Row 3
-		controlTile("levelSliderControl", "device.level", "slider", height: 1, width: 3, inactiveLabel: false) {
-			state "level", action:"music Player.setLevel", backgroundColor:"#ffffff"
-		}
+//		standardTile("airplay", "device.switch", width: 1, height: 1, decoration: "flat", canChangeIcon: true) {
+//			state "on", label:'AirPlay On', action:"switch.off", icon:"st.Electronics.electronics14", nextState:"off", backgroundColor:"#ffffff"
+//			state "off", label:'AirPlay Off', action:"switch.on", icon:"st.Electronics.electronics16", nextState:"on", backgroundColor:"#ffffff"
+//		}
+//		standardTile("status", "device.status", width: 1, height: 1, decoration: "flat", canChangeIcon: true) {
+//			state "playing", label:'Playing', action:"music Player.pause", icon:"st.Electronics.electronics19", nextState:"paused", backgroundColor:"#ffffff"
+//			state "stopped", label:'Stopped', action:"music Player.play", icon:"st.Electronics.electronics19", nextState:"playing", backgroundColor:"#ffffff"
+//			state "paused", label:'Paused', action:"music Player.play", icon:"st.Electronics.electronics19", nextState:"playing", backgroundColor:"#ffffff"
+//		}
+//		standardTile("mute", "device.mute", inactiveLabel: false, decoration: "flat") {
+//			state "unmuted", label:"Mute", action:"music Player.mute", icon:"st.custom.sonos.unmuted", backgroundColor:"#ffffff", nextState:"muted"
+//			state "muted", label:"Unmute", action:"music Player.unmute", icon:"st.custom.sonos.muted", backgroundColor:"#ffffff", nextState:"unmuted"
+//		}
+//
+//		// Row 3
+//		controlTile("levelSliderControl", "device.level", "slider", height: 1, width: 3, inactiveLabel: false) {
+//			state "level", action:"music Player.setLevel", backgroundColor:"#ffffff"
+//		}
 
 		// Row 4 - Disable this for now until we get communication back to hub working
 //		valueTile("currentSong", "device.trackDescription", inactiveLabel: true, height:1, width:3, decoration: "flat") {
 //			state "default", label:'${currentValue}', backgroundColor:"#ffffff"
 //		}
 
-		// Row 5
-		standardTile("refresh", "device.status", inactiveLabel: false, decoration: "flat") {
-			state "default", label:"", action:"refresh.refresh", icon:"st.secondary.refresh", backgroundColor:"#ffffff"
-		}
+//		// Row 5
+//		standardTile("refresh", "device.status", inactiveLabel: false, decoration: "flat") {
+//			state "default", label:"", action:"refresh.refresh", icon:"st.secondary.refresh", backgroundColor:"#ffffff"
+//		}
 
 		main "main"
 
 		details([
 			"previousTrack","playpause","nextTrack",
-			"airplay","status","mute",
-			"levelSliderControl",
+//			"airplay","status","mute",
+//			"levelSliderControl",
 //			"currentSong",
-			"refresh"
+//			"refresh"
 		])
 	}
     
@@ -106,46 +106,46 @@ metadata {
 
 // parse events into attributes
 def parse(String description) {
-	//log.debug "Parsing '${description}'"
-	def map = stringToMap(description)
-	if (map.headers && map.body) { //got device info response
-		if (map.body) {
-			def bodyString = new String(map.body.decodeBase64())
-			//log.debug "body = $bodyString"
-			def slurper = new JsonSlurper()
-			def result = slurper.parseText(bodyString)
-            if (result.containsKey("volume")) {
-            	log.debug "setting volume to ${result.volume}"
-            	sendEvent(name: "level", value: result.volume)
-            }
-            if (result.containsKey("mute")) {
-            	log.debug "setting mute to ${result.mute}"
-                sendEvent(name: "mute", value: result.mute)
-            }
-            if (result.containsKey("status")) {
-            	log.debug "setting status to ${result.status}"
-                sendEvent(name: "status", value: result.status)
-            }
-            if (result.containsKey("trackData")) {
-            	def json = new groovy.json.JsonBuilder(result.trackData)
-            	log.debug "setting trackData to ${json.toString()}"
-                sendEvent(name: "trackData", value: json.toString())
-            }
-            if (result.containsKey("trackDescription")) {
-            	log.debug "setting trackDescription info to ${result.trackDescription}"
-                sendEvent(name: "trackDescription", value: result.trackDescription)
-            }
-            if (result.containsKey("airplay")) {
-            	log.debug "setting airplay to ${result.airplay}"
-                sendEvent(name: "switch", value: result.airplay)
-            }
-            if (result.containsKey("playlists")) {
-            	result.playlists.each() {
-                	sendEvent(name: "trackData", value: "{\"station\": \"${it}\"}")
-                }
-            }
-		}
-	}
+	log.debug "Parsing '${description}'"
+//	def map = stringToMap(description)
+//	if (map.headers && map.body) { //got device info response
+//		if (map.body) {
+//			def bodyString = new String(map.body.decodeBase64())
+//			//log.debug "body = $bodyString"
+//			def slurper = new JsonSlurper()
+//			def result = slurper.parseText(bodyString)
+//            if (result.containsKey("volume")) {
+//            	log.debug "setting volume to ${result.volume}"
+//            	sendEvent(name: "level", value: result.volume)
+//            }
+//            if (result.containsKey("mute")) {
+//            	log.debug "setting mute to ${result.mute}"
+//                sendEvent(name: "mute", value: result.mute)
+//            }
+//            if (result.containsKey("status")) {
+//            	log.debug "setting status to ${result.status}"
+//                sendEvent(name: "status", value: result.status)
+//            }
+//            if (result.containsKey("trackData")) {
+//            	def json = new groovy.json.JsonBuilder(result.trackData)
+//            	log.debug "setting trackData to ${json.toString()}"
+//                sendEvent(name: "trackData", value: json.toString())
+//            }
+//            if (result.containsKey("trackDescription")) {
+//            	log.debug "setting trackDescription info to ${result.trackDescription}"
+//                sendEvent(name: "trackDescription", value: result.trackDescription)
+//            }
+//            if (result.containsKey("airplay")) {
+//            	log.debug "setting airplay to ${result.airplay}"
+//                sendEvent(name: "switch", value: result.airplay)
+//            }
+//            if (result.containsKey("playlists")) {
+//            	result.playlists.each() {
+//                	sendEvent(name: "trackData", value: "{\"station\": \"${it}\"}")
+//                }
+//            }
+//		}
+//	}
 }
 
 def updateState() {
@@ -154,7 +154,7 @@ def updateState() {
 
 def installed() {
 //	subscribeAction("/subscribe")
-    refresh()
+//    refresh()
 }
 
 // handle commands
@@ -162,17 +162,17 @@ def refresh() {
 	log.debug "refreshing"
 	//def address = getCallBackAddress()
     //sendCommand("subscribe=$address")
-    sendCommand("refresh")
+//    sendCommand("refresh")
 }
 
 def on() {
 	log.debug "Turn AirPlay on"
-    sendCommand("airplay=on")
+//    sendCommand("airplay=on")
 }
 
 def off() {
 	log.debug "Turn AirPlay off"
-    sendCommand("airplay=off")
+//    sendCommand("airplay=off")
 }
 
 def play() {
@@ -182,17 +182,17 @@ def play() {
 
 def pause() {
 	log.debug "Executing 'pause'"
-	sendCommand("command=pause")
+//	sendCommand("command=pause")
 }
 
 def stop() {
 	log.debug "Executing 'stop'"
-	sendCommand("command=stop")
+//	sendCommand("command=stop")
 }
 
 def nextTrack() {
 	log.debug "Executing 'nextTrack'"
-	sendCommand("command=next")
+//	sendCommand("command=next")
 }
 
 def playTrack(String uri, metaData="") {
@@ -207,7 +207,7 @@ def playTrack(Map trackData) {
 
 def setLevel(value) {
 	log.debug "Executing 'setLevel' to $value"
-	sendCommand("volume=$value")
+//	sendCommand("volume=$value")
 }
 
 def playText(String msg) {
@@ -217,17 +217,17 @@ def playText(String msg) {
 
 def mute() {
 	log.debug "Executing 'mute'"
-	sendCommand("command=mute")
+//	sendCommand("command=mute")
 }
 
 def previousTrack() {
 	log.debug "Executing 'previousTrack'"
-	sendCommand("command=previous")
+//	sendCommand("command=previous")
 }
 
 def unmute() {
 	log.debug "Executing 'unmute'"
-	sendCommand("command=unmute")
+//	sendCommand("command=unmute")
 }
 
 def setTrack(String uri, metaData="") {
@@ -302,7 +302,6 @@ private Integer convertHexToInt(hex) {
 	Integer.parseInt(hex,16)
 }
 
-
 private String convertHexToIP(hex) {
 	[convertHexToInt(hex[0..1]),convertHexToInt(hex[2..3]),convertHexToInt(hex[4..5]),convertHexToInt(hex[6..7])].join(".")
 }
@@ -334,20 +333,20 @@ private sendCommand(command) {
 
 private getPlaylists() {
 	log.debug "in getPlaylists!!!"
-	def path = "/get.html?list=playlists"
+//	def path = "/get.html?list=playlists"
     
-    def headers = [:] 
-    headers.put("GET", getHostAddress())
-    headers.put("Content-Type", "application/x-www-form-urlencoded")
+//    def headers = [:] 
+//    headers.put("GET", getHostAddress())
+//    headers.put("Content-Type", "application/x-www-form-urlencoded")
 
-    def method = "GET"
+//    def method = "GET"
     
-    def result = new physicalgraph.device.HubAction(
-        method: method,
-        path: path,
-        headers: headers
-	)
-    result
+//    def result = new physicalgraph.device.HubAction(
+//        method: method,
+//        path: path,
+//        headers: headers
+//	)
+//    result
 }
 
 private getCallBackAddress()
@@ -357,19 +356,19 @@ private getCallBackAddress()
 
 private subscribeAction(path, callbackPath="") {
     log.trace "SubscribeAction"
-    def address = device.hub.getDataValue("localIP") + ":" + device.hub.getDataValue("localSrvPortTCP")
-    def parts = device.deviceNetworkId.split(":")
-    def ip = convertHexToIP(parts[0])
-    def port = convertHexToInt(parts[1])
-    ip = ip + ":" + port
+//    def address = device.hub.getDataValue("localIP") + ":" + device.hub.getDataValue("localSrvPortTCP")
+//    def parts = device.deviceNetworkId.split(":")
+//    def ip = convertHexToIP(parts[0])
+//    def port = convertHexToInt(parts[1])
+//    ip = ip + ":" + port
 
-    def result = new physicalgraph.device.HubAction(
-        method: "SUBSCRIBE",
-        path: path,
-        headers: [
-            HOST: ip,
-            CALLBACK: "<http://${address}/obything>",
-            NT: "upnp:event",
-            TIMEOUT: "Second-3600"])
+//    def result = new physicalgraph.device.HubAction(
+//        method: "SUBSCRIBE",
+//        path: path,
+//        headers: [
+//            HOST: ip,
+//            CALLBACK: "<http://${address}/obything>",
+//            NT: "upnp:event",
+//            TIMEOUT: "Second-3600"])
 //	result
 }
