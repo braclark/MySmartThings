@@ -13,7 +13,7 @@
    * `sudo apt-get install php5 libapache2-mod-php5 -y`
    * `rm index.html`
    * `nano /var/www/index.php`
-   * `<?php phpinfo(); />`
+   * `<?php phpinfo(); ?>`
    * Test from another computer on the network `http://192.168.1.XX/index.php?track=test`
 1. Setup for web requests to play audio
   * Setup so that www-data can use audio
