@@ -18,7 +18,9 @@
 1. Setup for web requests to play audio
   * Setup so that www-data can use audio
    * [Reference used](http://raspberrypi.stackexchange.com/questions/19482/using-php-exec-command-to-play-audio-on-the-pi-no-audio-group)
-   * `sudo chmod 777 /dev/snd/` (not sure of the exact line)
+   * I'm not sure of the exact command I used, since I tried a lot of things before it worked
+     * I may have had to add www-data to the group audio too
+     * `sudo chmod 777 /dev/snd/`
    * Copy play.php into /var/www/
    * Test by requesting the following from a computer on a network.
     * `http://192.168.1.XX/play.php?track=http://s3.amazonaws.com/smartapp-media/sonos/bell1.mp3&volume=50`
