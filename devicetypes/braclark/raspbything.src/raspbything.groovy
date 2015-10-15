@@ -12,7 +12,12 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  */
- 
+
+preferences {
+    input("ip", "text", title: "IP Address", description: "Enter IP Address", required: true, defaultvalue: "192.168.1.1", displayDuringSetup: true)
+    input("port", "text", title: "Port", description: "", required: true, defaultvalue: 80, displayDuringSetup: true)
+    }
+    
 metadata {
 	definition (name: "RaspbyThing", namespace: "braclark", author: "Brandon Clark") {
 	capability "Music Player"
@@ -205,19 +210,28 @@ private String convertHexToIP(hex) {
 	[convertHexToInt(hex[0..1]),convertHexToInt(hex[2..3]),convertHexToInt(hex[4..5]),convertHexToInt(hex[6..7])].join(".")
 }
 
+private String convertIPtoHex(ipAddress) { 
+	String hex = ipAddress.tokenize( '.' ).collect {  String.format( '%02x', it.toInteger() ) }.join()
+	return hex
+	}
+
+private String convertPortToHex(port) {
+	String hexport = port.toString().format( '%04x', port.toInteger() )
+    return hexport
+	}
+	
 private getHostAddress() {
-	def parts = device.deviceNetworkId.split(":")
-	def ip = convertHexToIP(parts[0])
-	def port = convertHexToInt(parts[1])
 	return ip + ":" + port
 }
 
 private sendCommand(command) {
 	log.trace "SendCommand($command)"
+	device.deviceNetworkId = convertIPtoHex(ip) + ":" + convertPortToHex(port)
+	log.debug "IP: $ip Port: $port set to hex $device.deviceNetowrkID"
 	def path = "/play.php?$command"
-    def headers = [:] 
-    headers.put("HOST", getHostAddress())
-    headers.put("Content-Type", "application/x-www-form-urlencoded")
+	def headers = [:] 
+	headers.put("HOST", getHostAddress())
+	headers.put("Content-Type", "application/x-www-form-urlencoded")
 
     def method = "POST"
     
