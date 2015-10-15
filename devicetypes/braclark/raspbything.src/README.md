@@ -24,6 +24,12 @@
    * Copy play.php into /var/www/
    * Test by requesting the following from a computer on a network.
     * `http://192.168.1.XX/play.php?track=http://s3.amazonaws.com/smartapp-media/sonos/bell1.mp3&volume=50`
-1. Install Raspbything device type
+1. Install Raspbything device type from web api
   * Modified from Obything code
+  * "My Device Types" "New Device Type" "From Code" paste raspything.groovy "Create"
+1. Create device 
+  * "My Devices" "New Device" 
+  * For "Device Network ID" enter any hex value that you aren't already using (I usually use 99)
+  * For "Type" select "RaspbyThing"
+  * After creating the device, edit the preferences to input the IP and Port. "Device Network ID" will be overwritten with the hex values for these every time it is called.
 1. Install "Sonos Notify With Sound"
