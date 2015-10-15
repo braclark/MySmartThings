@@ -1,7 +1,6 @@
 /**
- *  ObyThing Music
- *
- *  Copyright 2014 obycode
+ *  RaspyThing player
+ *  Modified from ObyThing Music
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -16,11 +15,11 @@
  
 metadata {
 	definition (name: "RaspbyThing", namespace: "braclark", author: "Brandon Clark") {
-		capability "Music Player"
+	capability "Music Player"
         capability "Refresh"
         capability "Switch"
         
-		command "playTrackAtVolume", ["string","number"]
+	command "playTrackAtVolume", ["string","number"]
         command "playTrackAndResume", ["string","number","number"]
         command "playTextAndResume", ["string","number"]
         command "playTrackAndRestore", ["string","number","number"]
