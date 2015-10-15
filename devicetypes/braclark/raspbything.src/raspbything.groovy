@@ -15,14 +15,13 @@
 
 preferences {
     input("ip", "text", title: "IP Address", description: "Enter IP Address", required: true, defaultvalue: "192.168.1.1", displayDuringSetup: true)
-    input("port", "text", title: "Port", description: "", required: true, defaultvalue: 80, displayDuringSetup: true)
+    input("port", "text", title: "Port", description: "Port", required: true, defaultvalue: 80, displayDuringSetup: true)
     }
     
 metadata {
 	definition (name: "RaspbyThing", namespace: "braclark", author: "Brandon Clark") {
 	capability "Music Player"
         capability "Refresh"
-        capability "Switch"
         
 	command "playTrackAtVolume", ["string","number"]
         command "playTrackAndResume", ["string","number","number"]
@@ -227,7 +226,7 @@ private getHostAddress() {
 private sendCommand(command) {
 	log.trace "SendCommand($command)"
 	device.deviceNetworkId = convertIPtoHex(ip) + ":" + convertPortToHex(port)
-	log.debug "IP: $ip Port: $port set to hex $device.deviceNetowrkID"
+	log.debug "IP: $ip Port: $port set to hex"
 	def path = "/play.php?$command"
 	def headers = [:] 
 	headers.put("HOST", getHostAddress())
