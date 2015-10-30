@@ -21,14 +21,15 @@ preferences {
 metadata {
 	definition (name: "RaspbyThing", namespace: "braclark", author: "Brandon Clark") {
 	capability "Music Player"
-        capability "Refresh"
+	capability "Refresh"
         
 	command "playTrackAtVolume", ["string","number"]
-        command "playTrackAndResume", ["string","number","number"]
-        command "playTextAndResume", ["string","number"]
-        command "playTrackAndRestore", ["string","number","number"]
-        command "playTextAndRestore", ["string","number"]
-        command "playSoundAndTrack", ["string","number","json_object","number"]
+	command "playTrackAndResume", ["string","number","number"]
+	command "playTextAndResume", ["string","number"]
+	command "playTrackAndRestore", ["string","number","number"]
+	command "playTextAndRestore", ["string","number"]
+	command "playSoundAndTrack", ["string","number","json_object","number"]
+    command "playbell1"
 	}
 
 	simulator {
@@ -54,18 +55,32 @@ metadata {
 		standardTile("previousTrack", "device.status", width: 1, height: 1, decoration: "flat") {
 			state "previous", label:'', action:"music Player.previousTrack", icon:"st.sonos.previous-btn", backgroundColor:"#ffffff"
 		}
-
+		// Row 2
+		standardTile("Bell1", "device.playbell1", width: 1, height: 1, inactiveLabel: false, decoration: "flat") {
+			state "default", label:'Bell1', action:"playbell1", icon:"st.Electronics.electronics16", backgroundColor:"#ffffff"
+		}
+        standardTile("refresh", "device.refresh", inactiveLabel: false, decoration: "flat") {
+        	state "default", action:"refresh.refresh", icon: "st.secondary.refresh"
+        	}
+            
 		main "main"
 
 		details([
 			"previousTrack","playpause","nextTrack",
+            "Bell1","refresh"
 		])
 	}
 }
 
 // parse events into attributes
 def parse(String description) {
-	log.debug "Parsing '${description}'"
+//	log.debug "Parsing '${description}'"
+    def map = [:]
+    def descMap = parseDescriptionAsMap(description)
+    log.debug "descMap: ${descMap}"
+    def body = new String(descMap["body"].decodeBase64())
+    log.debug "body: ${body}"
+
 }
 
 def updateState() {
@@ -200,6 +215,11 @@ def playSoundAndTrack(soundUri, duration, trackData, volume=null) {
     sendCommand(cmd)
 }
 
+def playbell1() {
+  log.debug "Executing PlayBell1"
+  playTrackAtVolume("bell1.mp3", 100)
+}
+
 // Private functions used internally
 private Integer convertHexToInt(hex) {
 	Integer.parseInt(hex,16)
@@ -254,4 +274,11 @@ private getCallBackAddress()
 
 private subscribeAction(path, callbackPath="") {
     log.trace "SubscribeAction"
+}
+
+private parseDescriptionAsMap(description) {
+	description.split(",").inject([:]) { map, param ->
+		def nameAndValue = param.split(":")
+		map += [(nameAndValue[0].trim()):nameAndValue[1].trim()]
+	}
 }
