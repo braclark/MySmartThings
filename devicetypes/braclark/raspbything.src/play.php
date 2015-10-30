@@ -7,7 +7,7 @@
 $upload_path = "uploads/";
 $output = "No output";
 
-if (isset($_GET["volume"])){
+if (($_GET["volume"] >= 0) && ($_GET["volume"] <= 100)) {
 	$volume = $_GET["volume"];
 	} else {
 	$volume = 100;
