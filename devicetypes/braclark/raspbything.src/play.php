@@ -7,18 +7,24 @@
 $upload_path = "uploads/";
 $output = "No output";
 
+if (isset($_GET["volume"])){
+	$volume = $_GET["volume"];
+	} else {
+	$volume = 100;
+	}
+
 if (isset($_GET["track"])) {
   if (file_exists($upload_path.basename($_GET["track"]))){
     echo "Playing local file";
-    $command = "/usr/bin/mpg321 -g " . $_GET["volume"] . " " . $upload_path.basename($_GET["track"]);
+    $command = "/usr/bin/mpg321 -g " . $volume . " " . $upload_path.basename($_GET["track"]);
     } else {
     echo "Local file not found. Downloading file. ";
     file_put_contents($upload_path.basename($_GET["track"]), file_get_contents($_GET["track"]));
 		if (file_exists($upload_path.basename($_GET["track"]))){
 		  echo "Playing freshly downloaded local copy.";
-      $command = "/usr/bin/mpg321 -g " . $_GET["volume"] . " " . $upload_path.basename($_GET["track"]);
+      $command = "/usr/bin/mpg321 -g " . $volume . " " . $upload_path.basename($_GET["track"]);
 			}else{
-      $command = "/usr/bin/mpg321 -g " . $_GET["volume"] . " " . str_replace(" ","+",$_GET["track"]);
+      $command = "/usr/bin/mpg321 -g " . $volume . " " . str_replace(" ","+",$_GET["track"]);
 		  echo "Download not found. Playing remote version.";
 			}
     }
