@@ -1,40 +1,56 @@
-<html>
- <head>
-  <title>Php Play</title>
- </head>
-<body>
 <?php
 $upload_path = "uploads/";
-$output = "No output";
+//$output["Debug"] = "";
+$volume = 100;
 
-if (($_GET["volume"] >= 0) && ($_GET["volume"] <= 100)) {
+if (is_numeric($_GET["volume"])) {
 	$volume = $_GET["volume"];
-	} else {
-	$volume = 100;
-	}
+	} 
+
+$command = "/usr/bin/mpg321";
+// Quiet mode (no title or boilerplate)
+$command .= " -q";
+// Set gain (audio volume) to N (0-100)
+$command .= " -g $volume";
 
 if (isset($_GET["track"])) {
   if (file_exists($upload_path.basename($_GET["track"]))){
-    echo "Playing local file";
-    $command = "/usr/bin/mpg321 -g " . $volume . " " . $upload_path.basename($_GET["track"]);
+    $output["Debug"] = "Playing local file. ";
+    $command .= " ".$upload_path.basename($_GET["track"]);
     } else {
-    echo "Local file not found. Downloading file. ";
+    $output["Debug"] = "Local file not found. Downloading file. ";
     file_put_contents($upload_path.basename($_GET["track"]), file_get_contents($_GET["track"]));
 		if (file_exists($upload_path.basename($_GET["track"]))){
-		  echo "Playing freshly downloaded local copy.";
-      $command = "/usr/bin/mpg321 -g " . $volume . " " . $upload_path.basename($_GET["track"]);
+		  $output["Debug"] .= "Playing freshly downloaded local copy. ";
+      $command .= " " . $upload_path.basename($_GET["track"]);
 			}else{
-      $command = "/usr/bin/mpg321 -g " . $volume . " " . str_replace(" ","+",$_GET["track"]);
-		  echo "Download not found. Playing remote version.";
+      $command .= " " . str_replace(" ","+",$_GET["track"]);
+		  $output["Debug"] .= "Download not successful. Playing remote version. ";
 			}
     }
   
   $command = str_replace("https","http",$command);
-  echo "<pre>Command: ".$command."</pre>";
-  $output = shell_exec($command." 2>&1");
+  $output["trackData"] = basename($_GET["track"]);
+  $output["Command"] = $command;
+  $output["Output"] = shell_exec($command." 2>&1");
 
-  echo "<pre>Ouput: ".$output."</pre>";
+  echo json_encode($output);
+} elseif (isset($_GET["refresh"])) {
+  $dirContent = array_slice(scandir($upload_path),2);
+  foreach($dirContent as $key => $content) {
+    if (strlen($content)<44) {
+      $alldata[] = $content;
+      }
+    }
+//  $output["fileslist"] = array_slice(scandir($upload_path),2);
+  $output["fileslist"] = $alldata;
+  echo json_encode($output);
 } else {
+  echo "<html>\n";
+  echo " <head>\n";
+  echo "  <title>Php Play</title>\n";
+  echo " </head>\n";
+  echo "<body>\n";
   if ($_FILES){
     if (strlen($_POST['NewName']) > 0) {
       $target_path = $upload_path.$_POST['NewName'];
@@ -49,16 +65,17 @@ if (isset($_GET["track"])) {
   } else {
     echo "No file specified to play.";
   }
-  echo "<br><hr><br><form enctype=\"multipart/form-data\" action=\"test.php\" method=\"POST\">";
+  echo "<hr><form enctype=\"multipart/form-data\" action=\"play.php\" method=\"POST\">";
   echo "Choose a file to upload: <input name=\"uploadedfile\" type=\"file\"><br><br>";
-  echo "New Name: <input type=\"text\" name=\"NewName\"><br><br>";
+  echo "New Name: <input type=\"text\" name=\"NewName\"> (optional)<br><br>";
   echo "<input type=\"submit\" value=\"Upload File\">";
-  echo "</form><br><hr><br>";
+  echo "</form><hr>";
   echo "<pre> Listing of ".$upload_path."\n";
   $fileslist = scandir($upload_path);
-echo print_r($fileslist) . "</pre>";
-//phpinfo();
+  echo print_r($fileslist) . "</pre>";
+  //phpinfo();
+  echo "</body>\n";
+  echo "</html>\n";
 }
 ?>
-</body>
-</html>
+
