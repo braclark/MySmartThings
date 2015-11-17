@@ -22,7 +22,10 @@ metadata {
 	definition (name: "RaspbyThing", namespace: "braclark", author: "Brandon Clark") {
 	capability "Music Player"
 	capability "Refresh"
-        
+    
+    attribute "fileslist", "string"
+    attribute "trackData", "string"
+    
 	command "playTrackAtVolume", ["string","number"]
 	command "playTrackAndResume", ["string","number","number"]
 	command "playTextAndResume", ["string","number"]
@@ -74,13 +77,28 @@ metadata {
 
 // parse events into attributes
 def parse(String description) {
-//	log.debug "Parsing '${description}'"
     def map = [:]
     def descMap = parseDescriptionAsMap(description)
     log.debug "descMap: ${descMap}"
     def body = new String(descMap["body"].decodeBase64())
     log.debug "body: ${body}"
+    def bodyJson = parseJson(body)
+    def result = []
+    if (bodyJson.fileslist) {
+      result << createEvent(name: "fileslist", value: bodyJson.fileslist)
+      }
+    if (bodyJson.trackData) {
+      result << createEvent(name: "trackData", value: bodyJson.trackData)
+      }
+    log.debug "Parse Result: ${result}"  
+    return result
 
+//	createEvent(name: "trackData",
+//		value: "bell1.mp3",
+//		descriptionText: "test description",
+//		displayed: false,
+//		isStateChange: true
+//		)
 }
 
 def updateState() {
@@ -94,6 +112,7 @@ def installed() {
 // handle commands
 def refresh() {
 	log.debug "refreshing"
+    sendCommand("refresh")
 }
 
 def on() {
