@@ -8,13 +8,13 @@
 1. Setup web server
    * [Reference used](https://www.raspberrypi.org/documentation/remote-access/web-server/apache.md)
    * `sudo apt-get install apache2 -y`
-   * Test from another computer on the network `http://192.168.1.XX` (whatever the Pi's IP address is)
+   * Test from another computer on the network `http://192.168.1.XX` (whatever the Pi's IP address is) It should show a welcome to apache page.
    * `sudo chmod 777 /var/www` I did this so that user "pi" could edit the files without sudo
    * `sudo apt-get install php5 libapache2-mod-php5 -y`
    * `rm index.html`
    * `nano /var/www/index.php`
    * `<?php phpinfo(); ?>`
-   * Test from another computer on the network `http://192.168.1.XX/index.php?track=test`
+   * Test from another computer on the network `http://192.168.1.XX` It should show a php info page.
 1. Setup for web requests to play audio
   * Setup so that www-data can use audio
    * [Reference used](http://raspberrypi.stackexchange.com/questions/19482/using-php-exec-command-to-play-audio-on-the-pi-no-audio-group)
@@ -32,4 +32,4 @@
   * For "Device Network ID" enter any hex value that you aren't already using (I usually use 99)
   * For "Type" select "RaspbyThing"
   * After creating the device, edit the preferences to input the IP and Port. "Device Network ID" will be overwritten with the hex values for these every time it is called.
-1. Install "Sonos Notify With Sound"
+1. Tested with "Sonos Notify With Sound" and "Sonos Weather Forcast"
