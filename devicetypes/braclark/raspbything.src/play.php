@@ -1,6 +1,6 @@
 <?php
 $upload_path = "uploads/";
-//$output["Debug"] = "";
+$output["Debug"] = "";
 $volume = 100;
 
 if (is_numeric($_GET["volume"])) {
@@ -14,21 +14,26 @@ $command .= " -q";
 $command .= " -g $volume";
 
 if (isset($_GET["track"])) {
-  if (file_exists($upload_path.basename($_GET["track"]))){
-    $output["Debug"] = "Playing local file. ";
-    $command .= " ".$upload_path.basename($_GET["track"]);
+  if (strlen($upload_path.basename($_GET["track"]))<44) {
+    if (file_exists($upload_path.basename($_GET["track"]))){
+      $output["Debug"] .= "Playing local file. ";
+      $command .= " ".$upload_path.basename($_GET["track"]);
+      } else {
+      $output["Debug"] .= "Local file not found. Downloading file. ";
+      file_put_contents($upload_path.basename($_GET["track"]), file_get_contents($_GET["track"]));
+      if (file_exists($upload_path.basename($_GET["track"]))){
+        $output["Debug"] .= "Playing freshly downloaded local copy. ";
+        $command .= " " . $upload_path.basename($_GET["track"]);
+        }else{
+        $command .= " " . str_replace(" ","+",$_GET["track"]);
+        $output["Debug"] .= "Download not successful. Playing remote version. ";
+        }
+      }
     } else {
-    $output["Debug"] = "Local file not found. Downloading file. ";
-    file_put_contents($upload_path.basename($_GET["track"]), file_get_contents($_GET["track"]));
-		if (file_exists($upload_path.basename($_GET["track"]))){
-		  $output["Debug"] .= "Playing freshly downloaded local copy. ";
-      $command .= " " . $upload_path.basename($_GET["track"]);
-			}else{
       $command .= " " . str_replace(" ","+",$_GET["track"]);
-		  $output["Debug"] .= "Download not successful. Playing remote version. ";
-			}
+      $output["Debug"] .= "Len>44: Not downloading file. Playing remote version. ";
     }
-  
+
   $command = str_replace("https","http",$command);
   $output["trackData"] = basename($_GET["track"]);
   $output["Command"] = $command;
@@ -70,9 +75,11 @@ if (isset($_GET["track"])) {
   echo "New Name: <input type=\"text\" name=\"NewName\"> (optional)<br><br>";
   echo "<input type=\"submit\" value=\"Upload File\">";
   echo "</form><hr>";
-  echo "<pre> Listing of ".$upload_path."\n";
-  $fileslist = scandir($upload_path);
-  echo print_r($fileslist) . "</pre>";
+  echo "Listing of ".$upload_path."<br>\n";
+  $fileslist = array_slice(scandir($upload_path),2);
+  foreach ($fileslist as &$filename) {
+    echo "<a href=\"play.php?track=".$filename."\">".$filename."</a><br>\n";
+    }
   //phpinfo();
   echo "</body>\n";
   echo "</html>\n";
