@@ -35,12 +35,11 @@ preferences {
         input(name: "sms", type: "phone", title: "Text message", description: "10 digit phone number", required: false)
         input(name: "pushNotification", type: "bool", title: "Push notification", description: null, defaultValue: false)
         input(name: "sonos", type: "capability.musicPlayer", title: "Message on this player", required: false)
-        input(name: "message", type: "text", title:"Play this custom message", required:false, multiple: false, description: "Overrides default message")
         input(name: "volume", type: "number", title: "Sound volume", description: "0-100", required: false)
     }
-	section("Other Options") {
-        input(name: "aboveText", type: "text", title: "Above limit custom message text (after sensor name)", required: false)
-        input(name: "belowText", type: "text", title: "Below limit custom message text (after sensor name)", required: false)
+	section("With Message") {
+        input(name: "aboveText", type: "text", title: "Above limit custom message text (after sensor name)", required: true)
+        input(name: "belowText", type: "text", title: "Below limit custom message text (after sensor name)", required: true)
 	}
 }
 
@@ -76,12 +75,8 @@ def meterHandler(evt) {
         def aboveThresholdValue = aboveThreshold as int
         if (meterValue > aboveThresholdValue) {
             if (lastValue < aboveThresholdValue) { // only send notifications when crossing the threshold
-                if (aboveText) {
-                    def msg = "${meter} ${aboveText}"
-                } else {
-                    def msg = "${meter} is now on."
-                }
-                sendMessage(msg)
+                    def msg = "${aboveText}"
+                sendMessage("${msg}")
             } 
         }
     }
@@ -90,11 +85,7 @@ def meterHandler(evt) {
         def belowThresholdValue = belowThreshold as int
         if (meterValue < belowThresholdValue) {
             if (lastValue > belowThresholdValue) { // only send notifications when crossing the threshold
-                if (belowText) {
-                    def msg = "${meter} ${belowText}"
-                } else {
-                    def msg = "${meter} is now off."
-                }
+                    def msg = "${belowText}"
                 sendMessage(msg)
             } 
         }
@@ -102,18 +93,14 @@ def meterHandler(evt) {
 }
 
 def sendMessage(msg) {
-  if (sms) {
+   if (sms) {
     sendSms(sms, msg)
   }
   if (pushNotification) {
     sendPush(msg)
   }
   if (sonos) {
-    if (message) {
-      state.sound = textToSpeech(message instanceof List ? message[0] : message)
-    } else {
       state.sound = textToSpeech(msg instanceof List ? msg[0] : msg)
-    }
     sonos.playTrackAndRestore(state.sound.uri, state.sound.duration, volume)
   }
 }
