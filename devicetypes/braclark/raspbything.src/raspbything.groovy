@@ -22,6 +22,7 @@ metadata {
 	definition (name: "RaspbyThing", namespace: "braclark", author: "Brandon Clark") {
 	capability "Music Player"
 	capability "Refresh"
+	capability "Tone"
     
     attribute "fileslist", "string"
     attribute "trackData", "string"
@@ -41,10 +42,10 @@ metadata {
 
 	tiles {
 		// Main
-		standardTile("main", "device.status", width: 1, height: 1, canChangeIcon: true) {
-			state "paused", label:'Paused', action:"music Player.play", icon:"st.Electronics.electronics19", nextState:"playing", backgroundColor:"#ffffff"
-			state "playing", label:'Playing', action:"music Player.pause", icon:"st.Electronics.electronics19", nextState:"paused", backgroundColor:"#79b821"
-		}
+//		standardTile("main", "device.status", width: 1, height: 1, canChangeIcon: true) {
+//			state "paused", label:'Paused', action:"music Player.play", icon:"st.Electronics.electronics19", nextState:"playing", backgroundColor:"#ffffff"
+//			state "playing", label:'Playing', action:"music Player.pause", icon:"st.Electronics.electronics19", nextState:"paused", backgroundColor:"#79b821"
+//		}
 
 		// Row 1
 		standardTile("nextTrack", "device.status", width: 1, height: 1, decoration: "flat") {
@@ -66,7 +67,7 @@ metadata {
         	state "default", action:"refresh.refresh", icon: "st.secondary.refresh"
         	}
             
-		main "main"
+		main "refresh"
 
 		details([
 			"previousTrack","playpause","nextTrack",
@@ -110,6 +111,13 @@ def installed() {
 }
 
 // handle commands
+
+def beep() {
+	log.debug "Executing 'beep'"
+	def cmd = "playTrack&track=bell1.mp3&resume&volume=${volume}"
+    sendCommand(cmd)
+}
+
 def refresh() {
 	log.debug "refreshing"
     sendCommand("refresh")
