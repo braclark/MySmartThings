@@ -29,7 +29,11 @@ preferences {
 	section("When...") {
 		input(name: "meter", type: "capability.powerMeter", title: "This Power Meter...", required: true, multiple: false, description: null)
         input(name: "aboveThreshold", type: "number", title: "Reports Above...", required: false, description: "in watts")
+        input(name: "aboveLightOn", type: "capability.switch", multiple: true, title: "Turn these lights on:", required: false)
+        input(name: "aboveLightOff", type: "capability.switch", multiple: true, title: "Turn these lights off:", required: false)
         input(name: "belowThreshold", type: "number", title: "Or Reports Below...", required: false, description: "in watts")
+        input(name: "belowLightOn", type: "capability.switch", multiple: true, title: "Turn these lights on:", required: false)
+        input(name: "belowLightOff", type: "capability.switch", multiple: true, title: "Turn these lights off:", required: false)
 	}
     section("Notify via...") {
         input(name: "sms", type: "phone", title: "Text message", description: "10 digit phone number", required: false)
@@ -75,8 +79,10 @@ def meterHandler(evt) {
         def aboveThresholdValue = aboveThreshold as int
         if (meterValue > aboveThresholdValue) {
             if (lastValue < aboveThresholdValue) { // only send notifications when crossing the threshold
-                    def msg = "${aboveText}"
+                def msg = "${aboveText}"
                 sendMessage("${msg}")
+                aboveLightOn.on()
+                aboveLightOff.off()
             } 
         }
     }
@@ -85,8 +91,10 @@ def meterHandler(evt) {
         def belowThresholdValue = belowThreshold as int
         if (meterValue < belowThresholdValue) {
             if (lastValue > belowThresholdValue) { // only send notifications when crossing the threshold
-                    def msg = "${belowText}"
+                def msg = "${belowText}"
                 sendMessage(msg)
+                belowLightOn.on()
+                belowLightOff.off()
             } 
         }
     }
