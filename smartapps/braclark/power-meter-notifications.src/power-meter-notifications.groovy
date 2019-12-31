@@ -29,11 +29,7 @@ preferences {
 	section("When...") {
 		input(name: "meter", type: "capability.powerMeter", title: "This Power Meter...", required: true, multiple: false, description: null)
         input(name: "aboveThreshold", type: "number", title: "Reports Above...", required: false, description: "in watts")
-        input(name: "aboveLightOn", type: "capability.switch", multiple: true, title: "Turn these lights on:", required: false)
-        input(name: "aboveLightOff", type: "capability.switch", multiple: true, title: "Turn these lights off:", required: false)
         input(name: "belowThreshold", type: "number", title: "Or Reports Below...", required: false, description: "in watts")
-        input(name: "belowLightOn", type: "capability.switch", multiple: true, title: "Turn these lights on:", required: false)
-        input(name: "belowLightOff", type: "capability.switch", multiple: true, title: "Turn these lights off:", required: false)
 	}
     section("Notify via...") {
         input(name: "sms", type: "phone", title: "Text message", description: "10 digit phone number", required: false)
@@ -42,9 +38,17 @@ preferences {
         input(name: "volume", type: "number", title: "Sound volume", description: "0-100", required: false)
     }
 	section("With Message") {
-        input(name: "aboveText", type: "text", title: "Above limit custom message text (after sensor name)", required: true)
-        input(name: "belowText", type: "text", title: "Below limit custom message text (after sensor name)", required: true)
+        input(name: "aboveText", type: "text", title: "Above limit message text", required: false)
+        input(name: "belowText", type: "text", title: "Below limit message text", required: false)
 	}
+	section("With These Lights") {
+        input(name: "aboveLightOn", type: "capability.switch", multiple: true, title: "Above the threshold, turn these lights on:", required: false)
+        input(name: "aboveLightOff", type: "capability.switch", multiple: true, title: "Above the threshold, turn these lights off:", required: false)
+        input(name: "belowLightOn", type: "capability.switch", multiple: true, title: "Below the threshold, turn these lights on:", required: false)
+        input(name: "belowLightOff", type: "capability.switch", multiple: true, title: "Below the threshold, turn these lights off:", required: false)
+	}
+    
+    
 }
 
 def installed() {
@@ -63,26 +67,21 @@ def initialize() {
 }
 
 def meterHandler(evt) {
-
+    log.debug "Event Name: $evt.name Value: $evt.value lastValue: $atomicState.lastValue"
     def meterValue = evt.value as double
-
-    if (!atomicState.lastValue) {
-    	atomicState.lastValue = meterValue
-    }
-
+//    if (!atomicState.lastValue) { // this line breaks the above threashold notifications
+//    	atomicState.lastValue = meterValue
+//    }
     def lastValue = atomicState.lastValue as double
-    atomicState.lastValue = meterValue
-
     def dUnit = evt.unit ?: "Watts"
 
     if (aboveThreshold) {
         def aboveThresholdValue = aboveThreshold as int
         if (meterValue > aboveThresholdValue) {
             if (lastValue < aboveThresholdValue) { // only send notifications when crossing the threshold
-                def msg = "${aboveText}"
-                sendMessage("${msg}")
-                aboveLightOn.on()
-                aboveLightOff.off()
+                if (aboveText) { sendMessage(aboveText) }
+                if (aboveLightOn) { aboveLightOn.on() }
+                if (aboveLightOff) { aboveLightOff.off() }
             } 
         }
     }
@@ -91,13 +90,13 @@ def meterHandler(evt) {
         def belowThresholdValue = belowThreshold as int
         if (meterValue < belowThresholdValue) {
             if (lastValue > belowThresholdValue) { // only send notifications when crossing the threshold
-                def msg = "${belowText}"
-                sendMessage(msg)
-                belowLightOn.on()
-                belowLightOff.off()
+                if (belowText) { sendMessage(belowText) }
+                if (belowLightOn) { belowLightOn.on() }
+                if (belowLightOff) { belowLightOff.off() }
             } 
         }
     }
+    atomicState.lastValue = meterValue
 }
 
 def sendMessage(msg) {
